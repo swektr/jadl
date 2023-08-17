@@ -1,3 +1,4 @@
+// probably not a good way of making a Timer, but it works
 pub mod timer {
     use std::time::Duration;
     use std::sync::{Arc, Mutex};
@@ -8,6 +9,7 @@ pub mod timer {
         cancel: Arc<Mutex<bool>>,
     }
     impl Timer {
+        /// Create a new Timer that runs some function(func) after some duration(dur).
         pub fn new(dur: Duration,func: fn()) -> Timer {
             Timer {
                 dur,
@@ -15,7 +17,7 @@ pub mod timer {
                 cancel: Arc::new(Mutex::new(false)),
             }
         }
-        
+        /// Start a Timer, run its func after its dur
         pub fn start(&self) -> JoinHandle<()> {
             let cancel = Arc::clone(&self.cancel);
             let dur = self.dur.clone();
@@ -29,7 +31,7 @@ pub mod timer {
                 
             }) 
         }
-    
+        /// Tells a started Timer not to run its func then drops the Timer struct;
         pub fn cancel(self){
             *self.cancel.lock().unwrap() = true;
         }
