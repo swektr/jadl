@@ -7,6 +7,8 @@ use clap::Parser;
 use libmpv::Mpv;
 use termios::{Termios, TCSANOW, ECHO, ICANON, tcsetattr};
 use serde_derive::{Serialize, Deserialize};
+use std::time::Duration;
+use jadl::timer::Timer;
 
 trait PathExt {
     fn file_exists(&self) -> bool;
@@ -110,14 +112,18 @@ fn curl_download(url: &String, file: &Path) -> Result<(), DownloadError> {
     let file_string = file.as_os_str()
                           .to_str()
                           .expect("Error converting Path to &str");
+    
+    let curl_timer = Timer::new(Duration::from_millis(1000), ||println!("This may take a moment..."));
+    curl_timer.start();
+
     println!("Running 'curl'");
-    // Run curl command and save temp file
     let curl_status = Command::new("curl")
                               .args([url, "--output", file_string])
                               .output()
                               .expect("Error running curl")
                               .status;
-    
+    curl_timer.cancel(); 
+
     return match curl_status.code() {
         Some(0) => {
             println!("Download Success");
