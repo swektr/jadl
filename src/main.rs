@@ -51,5 +51,5 @@ fn main() -> ExitCode {
         move_file(&temp_path, &dest_path);
     }
     
-    return ExitCode::SUCCESS;
+    ExitCode::SUCCESS
 }

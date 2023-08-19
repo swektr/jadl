@@ -18,7 +18,7 @@ pub trait PathExt {
 
 impl PathExt for Path {
     fn file_exists(&self) -> bool {
-        return self.is_file() && self.exists();
+        self.is_file() && self.exists()
     }
 }
 
@@ -56,7 +56,7 @@ pub fn load_config() -> JadlConfig {
                     )
                     .expect("Error reading environment variables");        
     
-    return match fs::read_to_string(&config_path) {
+    match fs::read_to_string(&config_path) {
         Ok(contents) =>{ 
             toml::from_str(&contents).expect("Error parsing config file")
         }
