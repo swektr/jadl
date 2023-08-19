@@ -2,13 +2,14 @@ use std::{fs,
           env::var,
           io::{self, Read, Write},
           path::{Path, PathBuf},
-          process::{Command, ExitCode}}; // dont know why i did this
+          process::{Command, ExitCode, Stdio}}; // dont know why i did this
 use clap::Parser;
 use libmpv::Mpv;
 use termios::{Termios, TCSANOW, ECHO, ICANON, tcsetattr};
 use serde_derive::{Serialize, Deserialize};
 use std::time::Duration;
 use jadl::timer::Timer;
+
 
 trait PathExt {
     fn file_exists(&self) -> bool;
@@ -29,12 +30,16 @@ struct Cli {
     kanji: String,
     /// The word's reading
     kana: String,
-    /// force overwrite files
+    /// Force overwrite files
     #[clap(long,short,action)]
     force: bool,
-    /// use the anki directory
+    /// Use the anki directory
     #[clap(long,short,action)]
-    anki: bool
+    anki: bool,
+    /// Copies a formated "[sound:]" string to your clipboard.
+    /// Use with --anki option. (or don't)
+    #[clap(long,short,action,verbatim_doc_comment)]
+    copy: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -72,6 +77,13 @@ fn main() -> ExitCode {
         println!("File \x1b[0;33m{:?}\x1b[0m already exists!\nRun with -f flag to force overwrite",
                   dest_path.as_os_str());
         return ExitCode::FAILURE;
+    }
+
+    if args.copy {
+        let sound_str = format!("[sound:{}]", filename);
+        if let Err(_) = set_clipboard(&sound_str) {
+            eprintln!("Error setting clipboard!");
+        }
     }
 
     // Download file
@@ -113,7 +125,8 @@ fn curl_download(url: &String, file: &Path) -> Result<(), DownloadError> {
                           .to_str()
                           .expect("Error converting Path to &str");
     
-    let curl_timer = Timer::new(Duration::from_millis(1000), ||println!("This may take a moment..."));
+    let curl_timer = Timer::new(Duration::from_millis(1000),
+                             || println!("This may take a moment..."));
     curl_timer.start();
 
     println!("Running 'curl'");
@@ -192,4 +205,16 @@ fn move_file(from: &Path, to: &Path) {
         eprintln!("Error removing temp file: {:?}", e);
     }
     println!("File saved to \x1b[0;32m{:?}\x1b[0m", to.as_os_str());
+}
+
+fn set_clipboard(txt: &String) -> Result<(), Box<dyn std::error::Error>> {
+    let mut xsel = Command::new("xsel")
+                       .arg("-bi")
+                       .stdin(Stdio::piped())
+                       .spawn()?;
+    let xsel_in = xsel.stdin.as_mut().unwrap();
+    xsel_in.write_all(txt.as_bytes())?;
+    xsel.wait()?;
+
+    Ok(())
 }
