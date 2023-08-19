@@ -26,6 +26,7 @@ Run program like this `jadl [OPTIONS] <KANJI> <KANA>`
 <u>Options:</u>
 * `-f, --force` -- Overwrite existing files.
 * `-a, --anki` -- Download file to anki's `collection.media` directory.
+* `-c, --copy` -- Copies a formated "[sound:]" string to your clipboard.
 * `-h, --help` -- Print usage help.
 
 # Configuration
