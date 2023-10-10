@@ -17,17 +17,20 @@ This is my first Rust program! It's a rewrite of an old Bash script I made that 
 Run: `cargo build`
 
 # Usage
-Run program like this `jadl [OPTIONS] <KANJI> <KANA>`
+```
+Usage: jadl [OPTIONS] <KANJI> <KANA>
 
-<u>Arguments:</u>
-* `KANJI` (required) The word written in kanji.
-* `KANA` (required) The word's reading written in kana.
+Arguments:
+  <KANJI>  Word in kanji
+  <KANA>   The word's reading
 
-<u>Options:</u>
-* `-f, --force` -- Overwrite existing files.
-* `-a, --anki` -- Download file to anki's `collection.media` directory.
-* `-c, --copy` -- Copies a formated "[sound:]" string to your clipboard.
-* `-h, --help` -- Print usage help.
+Options:
+  -f, --force  Force overwrite files
+  -a, --anki   Use the anki directory
+  -c, --copy   Copies a formated "[sound:]" string to your clipboard.
+               Use with --anki option. (or don't)
+  -h, --help   Print help
+  ```
 
 # Configuration
  The download directories can be configured using a config file located at: `$XDG_CONFIG_HOME/jadl/config.toml`. If `XDG_CONFIG_HOME` is not set, then `$HOME/.config/jadl/config.toml` is used.
